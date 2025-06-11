@@ -6,14 +6,14 @@
     <title>The Victim's Trajectory: Understanding Covert Narcissistic Abuse</title>
     
     <!-- Chosen Palette: Calm Neutrality -->
-    <!-- Application Structure Plan: The application is structured as an interactive journey rather than a linear report. It begins with a compassionate introduction. The core of the app is the "Victim's Trajectory," a three-part interactive section (The Target Profile, Abuser's Tactics, The Aftermath) using clickable cards for exploration. The most critical part is the "Synergy of Transformation," an interactive diagram visually linking pre-abuse traits to post-abuse symptoms, which is the central thesis of the source report. This is followed by a "Before & After" radar chart for a powerful visual comparison and an interactive diagram of physiological impacts. A final section contains the full text of the source research report, accessible from the main navigation. This structure was chosen because it breaks down dense information into manageable pieces and allows users to discover the crucial connections between concepts at their own pace, which is more effective for learning and retention than a long, scrolling document, while still providing full-text access for deep dives. -->
+    <!-- Application Structure Plan: The application is structured as an interactive journey. It uses clickable cards for the main concepts (Target Profile, Tactics, Aftermath) to allow for non-linear exploration. The core thesis is visualized in the "Synergy of Transformation" diagram. A "Before & After" radar chart provides a stark comparison. The physiological impact is shown on an improved, visible body heatmap. The full research report is now handled via an embedded PDF viewer for efficiency and to accommodate large documents. This structure prioritizes user-paced learning and visual data representation over a static text document. -->
     <!-- Visualization & Content Choices: 
-        - [The Target Profile & Abuser's Tactics]: Goal: Organize/Inform. Method: Interactive HTML cards. Interaction: Click to reveal details. Justification: Prevents overwhelming the user with text, encourages active exploration.
-        - [Synergy of Transformation]: Goal: Show Relationships. Method: Custom interactive diagram (HTML/CSS/JS). Interaction: Click a "Before" trait to see its "After" consequence and read the explanation. Justification: This is the most effective way to communicate the report's core "tragic synergy" concept, making the connection explicit and memorable.
-        - [Before & After Profile]: Goal: Compare. Method: Chart.js Radar Chart. Interaction: Buttons to toggle between "Before" and "After" profiles. Justification: Provides a stark, immediate visual representation of the psychological transformation.
-        - [Physiological Impact]: Goal: Inform/Organize. Method: Interactive HTML/CSS diagram. Interaction: Hover over body areas to see related symptoms. Justification: More engaging and less clinical than a simple list, connecting symptoms to the physical self.
-        - [Full Report]: Goal: Provide deep-dive reference. Method: Formatted HTML text section. Interaction: Scroll navigation. Justification: Allows users who want the full academic text to access it without leaving the page.
-        - Library/Method: Vanilla JS for all logic, Chart.js for the radar chart, Tailwind CSS for styling. -->
+        - [The Target Profile, Abuser's Tactics, The Aftermath]: Goal: Organize/Inform. Method: Interactive HTML cards with expanded content. Interaction: Click to reveal. Justification: Prevents information overload.
+        - [Synergy of Transformation]: Goal: Show Relationships. Method: Custom interactive diagram (HTML/CSS/JS). Interaction: Click trait to highlight consequence. Justification: Makes the core concept of the report explicit and interactive.
+        - [Before & After Profile]: Goal: Compare. Method: Chart.js Radar Chart. Interaction: Buttons to toggle profiles. Justification: Strong visual data representation of change.
+        - [Physiological Impact]: Goal: Inform/Organize. Method: Improved interactive HTML/CSS body heatmap, now with visible default state. Interaction: Hover to see symptoms. Justification: More intuitive and engaging than a list.
+        - [Full Report]: Goal: Provide deep-dive reference. Method: Embedded PDF viewer. Interaction: Standard PDF controls (scroll, zoom). Justification: Efficiently handles large documents without bogging down the main HTML file. User must provide the PDF.
+        - Library/Method: Vanilla JS for logic, Chart.js for radar, Tailwind CSS for style. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -58,10 +58,18 @@
         .card.open .icon {
             transform: rotate(45deg);
         }
+        .body-silhouette {
+            position: relative;
+            width: 150px;
+            height: 350px;
+            margin: auto;
+        }
         .body-part {
-            transition: background-color 0.3s ease;
             position: absolute;
-            border-radius: 9999px;
+            border-radius: 50%;
+            background-color: rgba(169, 113, 85, 0.2);
+            transition: background-color 0.3s ease;
+            cursor: pointer;
         }
         .body-part:hover {
             background-color: rgba(169, 113, 85, 0.5);
@@ -70,6 +78,28 @@
             visibility: hidden;
             opacity: 0;
             transition: visibility 0s, opacity 0.3s linear;
+            position: absolute;
+            background-color: #3C3C3C;
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            z-index: 10;
+            width: 160px;
+            font-size: 0.8rem;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -80px;
+        }
+        .symptom-tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #3C3C3C transparent transparent transparent;
         }
         .body-part:hover .symptom-tooltip {
             visibility: visible;
@@ -84,39 +114,6 @@
             height: 300px;
             max-height: 400px;
         }
-        #full-report-content h2 {
-            font-size: 1.875rem;
-            font-weight: 700;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-            border-bottom: 1px solid #e5e7eb;
-            padding-bottom: 0.5rem;
-        }
-        #full-report-content h3 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-top: 1.5rem;
-            margin-bottom: 1rem;
-        }
-        #full-report-content p, #full-report-content li {
-            line-height: 1.75;
-            margin-bottom: 1rem;
-        }
-        #full-report-content table {
-            width: 100%;
-            margin-top: 1.5rem;
-            margin-bottom: 1.5rem;
-            border-collapse: collapse;
-        }
-        #full-report-content th, #full-report-content td {
-            border: 1px solid #ddd;
-            padding: 0.75rem;
-            text-align: left;
-        }
-        #full-report-content th {
-            background-color: #f3f4f6;
-        }
-
         @media (min-width: 768px) {
             .chart-container {
                 height: 400px;
@@ -234,22 +231,26 @@
                 <div class="bg-white p-6 rounded-lg shadow-lg">
                     <h3 class="text-xl font-semibold text-center mb-4">Physiological Manifestations</h3>
                     <p class="text-center text-gray-600 mb-6">The body keeps the score. Chronic stress from abuse often manifests physically. Hover over the areas below.</p>
-                    <div class="relative w-[150px] h-[350px] mx-auto">
+                    <div class="body-silhouette">
                         <!-- Head -->
-                        <div class="body-part top-0 left-[37.5%] w-[25%] h-[15%]" data-symptom="Headaches & Migraines, Brain Fog, Cognitive Issues">
-                             <div class="symptom-tooltip absolute -top-16 -left-12 w-40 bg-gray-800 text-white text-xs rounded py-1 px-2 text-center">Headaches & Migraines, Cognitive Issues</div>
+                        <div class="body-part" style="top: 0; left: 35%; width: 30%; height: 15%;">
+                            <div class="symptom-tooltip">Headaches, Migraines, Brain Fog, Cognitive Issues</div>
+                        </div>
+                        <!-- Neck -->
+                        <div class="body-part !rounded-none" style="top: 15%; left: 42%; width: 16%; height: 5%;">
+                             <div class="symptom-tooltip">Neck & Shoulder Tension</div>
                         </div>
                         <!-- Chest/Heart -->
-                        <div class="body-part top-[20%] left-[25%] w-[50%] h-[20%]" data-symptom="Cardiovascular Issues, Weakened Immune Response, Autoimmune Disorders">
-                             <div class="symptom-tooltip absolute top-1/4 -right-44 w-40 bg-gray-800 text-white text-xs rounded py-1 px-2 text-center">Immune & Autoimmune Issues</div>
+                        <div class="body-part" style="top: 20%; left: 25%; width: 50%; height: 20%;">
+                            <div class="symptom-tooltip">Immune & Autoimmune Issues, Cardiovascular Stress</div>
                         </div>
                         <!-- Stomach -->
-                        <div class="body-part top-[45%] left-[30%] w-[40%] h-[15%]" data-symptom="Gastrointestinal Issues (IBS, Acid Reflux)">
-                             <div class="symptom-tooltip absolute top-1/2 -left-44 w-40 bg-gray-800 text-white text-xs rounded py-1 px-2 text-center">Gastrointestinal Issues (IBS)</div>
+                        <div class="body-part" style="top: 40%; left: 30%; width: 40%; height: 15%;">
+                             <div class="symptom-tooltip">Gastrointestinal Issues (IBS), Nausea</div>
                         </div>
-                         <!-- Body -->
-                        <div class="body-part top-[15%] left-[10%] w-[80%] h-[85%] !rounded-2xl" data-symptom="Chronic Fatigue, Fibromyalgia, Muscle Tension, Sleep Disturbances">
-                             <div class="symptom-tooltip absolute -bottom-12 left-0 w-40 bg-gray-800 text-white text-xs rounded py-1 px-2 text-center">Chronic Fatigue, Fibromyalgia, Muscle Tension</div>
+                        <!-- Limbs/General -->
+                        <div class="body-part !rounded-lg" style="top: 20%; left: 15%; width: 70%; height: 70%;">
+                             <div class="symptom-tooltip">Chronic Fatigue, Fibromyalgia, Widespread Muscle Pain, Sleep Disturbances</div>
                         </div>
                     </div>
                 </div>
@@ -260,9 +261,12 @@
         <section id="full-report" class="scroll-mt-20 bg-white p-6 sm:p-8 lg:p-12 rounded-lg shadow-lg">
              <div class="text-center mb-12">
                 <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Full Research Report</h2>
+                <p class="text-lg text-gray-700 max-w-3xl mx-auto mt-4">
+                    The complete research paper is embedded below. Please ensure you have a file named <code class="bg-gray-200 text-sm p-1 rounded">full_research_report.pdf</code> in the same directory as this HTML file.
+                </p>
              </div>
-             <div id="full-report-content" class="prose max-w-none">
-                <!-- Content will be injected here by JavaScript -->
+             <div class="w-full h-[80vh] border rounded-md">
+                 <embed src="full_research_report.pdf" type="application/pdf" width="100%" height="100%" />
              </div>
         </section>
 
@@ -301,12 +305,12 @@ document.addEventListener('DOMContentLoaded', function() {
             { title: 'Intermittent Reinforcement', content: "Cycles of positive attention (love bombing) and negative treatment (devaluation). This creates a powerful, addictive bond similar to a gambling addiction, as the victim clings to hope for the 'good times'." },
         ],
         symptoms: [
-            { id: 'cptsd', title: 'Complex PTSD (C-PTSD)', content: "A result of prolonged relational trauma. Symptoms include emotional flashbacks, a toxic inner critic, emotional dysregulation, and a persistent feeling of being unsafe." },
-            { id: 'cognitive_dissonance', title: 'Cognitive Dissonance', content: "The mental stress of holding conflicting beliefs: 'this person loves me' vs. 'this person is harming me.' This leads to confusion, rationalizing the abuse, and self-blame." },
-            { id: 'narcissistic_fleas', title: '"Narcissistic Fleas"', content: "When the victim adopts the abuser's behaviors (e.g., reactive abuse, withdrawal) as a survival mechanism. This causes intense guilt and can be used by the abuser to shift blame." },
-            { id: 'identity_loss', title: 'Identity Loss / Erasure', content: "After years of suppressing their own needs and opinions to please the abuser, victims may no longer know who they are, what they like, or what they believe." },
-            { id: 'social_isolation', title: 'Social Isolation & Distrust', content: "Profound difficulty trusting others and oneself. This can be engineered by the abuser or self-imposed due to fear, shame, and hypervigilance." },
-            { id: 'physiological', title: 'Physiological Manifestations', content: "Chronic stress manifests physically as fatigue, sleep disturbances, GI issues, autoimmune problems, fibromyalgia, and chronic pain. The body keeps the score." },
+            { id: 'cptsd', title: 'Complex PTSD (C-PTSD)', content: "The signature wound of prolonged relational abuse. It goes beyond classic PTSD, causing severe emotional dysregulation (wild mood swings or numbness), a profoundly negative self-concept (toxic shame, feeling worthless), and extreme difficulty in relationships (deep distrust, fear of intimacy)." },
+            { id: 'cognitive_dissonance', title: 'Cognitive Dissonance & Reality Erosion', content: "Chronic gaslighting creates intense mental stress from holding conflicting beliefs ('they love me' vs. 'they hurt me'). To cope, victims often minimize the abuse or blame themselves, which reinforces the trauma bond and detaches them further from their own reality." },
+            { id: 'narcissistic_fleas', title: '"Narcissistic Fleas" & Reactive Abuse', content: "Victims may adopt the abuser's toxic behaviors (e.g., yelling, withdrawing) as a survival mechanism. This 'reactive abuse' is often deliberately provoked by the narcissist, who then uses it as 'proof' that the victim is the unstable one, causing the victim intense guilt and confusion." },
+            { id: 'identity_loss', title: 'Identity Loss / Erasure of Self', content: "After years of suppressing their own needs, opinions, and feelings to please the abuser, victims become profoundly disconnected from their authentic self. They may no longer know what they like, what they believe, or who they are outside of the relationship, resulting in a hollow sense of self." },
+            { id: 'social_isolation', title: 'Social Isolation & Pervasive Distrust', content: "The abuser often intentionally isolates the victim from support systems. Post-abuse, survivors struggle with pervasive distrust of everyone, including themselves. They may self-isolate out of fear, shame, and an inability to believe that others can be sincere or safe." },
+            { id: 'physiological', title: 'Physiological Breakdown', content: "The body keeps the score. Chronic stress from unrelenting psychological threat leads to a cascade of physical ailments: chronic fatigue, autoimmune disorders, fibromyalgia, GI issues, and sleep disturbances, as the nervous system is in a constant state of high alert." },
         ],
         synergy: [
             { from: 'empathy', to: 'hypervigilance', text: 'A high capacity for empathy, once used for connection, is corrupted into painful hypervigilance. The victim learns to use their sensitivity not to connect, but to constantly scan others for subtle signs of insincerity, manipulation, or threat, making genuine connection feel unsafe.' },
@@ -327,81 +331,6 @@ document.addEventListener('DOMContentLoaded', function() {
             { id: 'trusting_nature', title: 'Trusting Nature' },
         ]
     };
-
-    // --- FULL REPORT CONTENT ---
-    const fullReportHTML = `
-        <h1>The Victim's Trajectory in Covert Narcissistic Abuse: A Multi-Dimensional Analysis</h1>
-        <h2>Introduction</h2>
-        <p>Covert narcissistic abuse represents a particularly insidious and damaging form of psychological manipulation, distinguished by its subtle, indirect, and often veiled nature.[1, 2] Unlike overt narcissism, which is typically characterized by grandiose displays and an obvious sense of entitlement, covert narcissism operates beneath the surface, making it exceptionally challenging for victims, onlookers, and even some professionals to recognize.[3, 4, 5] The abuser, often presenting with an air of shyness, sensitivity, or even victimhood, weaves a complex web of emotional control that can leave their target feeling confused, doubting their sanity, and profoundly traumatized.[6, 7, 8] The very "covert" quality of this abuse is not merely a characteristic of the perpetrator but a fundamental element shaping the entirety of the victim's experience, often leading to prolonged periods of unrecognized abuse and, consequently, more deeply entrenched psychological, behavioral, and physiological sequelae.</p>
-        <p>This report aims to meticulously chart the victim's trajectory through the harrowing landscape of covert narcissistic abuse. It will begin by examining the pre-existing vulnerabilities—traits, histories, and relational patterns—that may render an individual a desirable and sustainable target for a covert narcissist. Subsequently, it will detail the complex symptomatology that emerges during and after the period of sustained abuse, encompassing psychological disturbances, behavioral transformations, and physiological manifestations. Finally, and crucially, this analysis will explore the tragic synergy where these pre-existing vulnerabilities are not only exploited but are also magnified and distorted by the abusive experience, shaping the victim's post-abuse presentation. The overarching goal is to develop a holistic model that illuminates the multifaceted journey of the victim, fostering a deeper understanding of the profound impact of this hidden form of abuse. This comprehensive understanding is paramount, as the difficulty in recognizing covert narcissistic patterns means that victims may endure years of manipulation before the abuse is identified, if at all.[3, 9] The hiddenness of the abuse, therefore, becomes a primary driver of the severity and complexity of the victim's trajectory, underscoring the urgent need for greater awareness to facilitate early intervention and effective support.</p>
-        
-        <h2>Part 1: The Target Profile – Pre-Abuse Vulnerabilities and Selection by the Covert Narcissist</h2>
-        <p>The selection of a target by a covert narcissist is not a random occurrence but often involves a nuanced interplay between the abuser's specific psychological needs and the potential victim's characteristics. This section dissects the constellation of traits, histories, and relational patterns that can render an individual particularly susceptible to the covert narcissist's subtle yet persistent manipulation, making them a "desirable and sustainable target." It is crucial to approach this analysis not as a form of victim-blaming, but as an endeavor to understand the complex dynamics that facilitate these destructive relationships.</p>
-        
-        <h3>1.1. The Constellation of Susceptibility: Inherent Traits and Dispositions</h3>
-        <p>Certain inherent personality traits and dispositions, while often positive in healthy contexts, can inadvertently become vulnerabilities when encountered by an individual with covert narcissistic tendencies. Research and clinical observations suggest that individuals possessing high levels of empathy, agreeableness, and conscientiousness are frequently targeted.[7, 10, 11] Highly empathetic and compassionate individuals may be particularly attractive to covert narcissists because their nature inclines them to overlook initial red flags and prioritize the perceived needs or distress of the narcissist.[7] The "empath," characterized by a rich emotional world and a strong need for connection, can become a "gold mine of narcissistic supply" due to their inner beauty, often coupled with weaker boundaries.[12]</p>
-        <p>Agreeableness, the tendency to be cooperative, kind, and avoid conflict, can make it difficult for an individual to confront the subtle manipulations and boundary violations characteristic of covert abuse. Similarly, conscientiousness—a trait encompassing responsibility, diligence, and a strong moral compass—can be exploited. Manipulators frequently use guilt and shame as primary weapons, and these tactics are particularly effective against conscientious individuals who inherently care about fairness, strive to do what is right, and dislike being perceived as wrong or unfair.[11] A covert narcissist might complain about perceived unfairness, and because the conscientious target takes such complaints seriously, they may internalize blame or try harder to appease the narcissist, unaware that this is a manipulative ploy.[11]</p>
-        
-        <h3>1.2. Attachment and Relational History: The "Blueprint" for Abuse</h3>
-        <p>An individual's attachment style and relational history significantly influence their vulnerability to narcissistic abuse. There is a strong correlation between insecure attachment styles—particularly anxious or disorganized patterns—and susceptibility to such dynamics.[17, 18] A history of codependency, ingrained people-pleasing behaviors, or, critically, having been raised by a parent with narcissistic traits can create a "blueprint" for abusive relationships, making the covert narcissist's patterns feel disturbingly familiar, even if destructive.[17, 19, 20]</p>
-        
-        <!-- ... More content from the report would go here ... -->
-
-        <h3>Table 1: Summary of Pre-Abuse Vulnerability Factors and Covert Narcissistic Exploitation</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Vulnerability Factor</th>
-                    <th>Description of Factor</th>
-                    <th>How Covert Narcissist Exploits This</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><strong>High Empathy</strong></td>
-                    <td>Innate ability to understand and share the feelings of others; strong desire to connect and alleviate suffering.[7, 12]</td>
-                    <td>Presents as vulnerable, misunderstood, or in need of support, eliciting the victim's empathy and care, which becomes a source of narcissistic supply. Victim may overlook red flags due to compassion.[2, 7]</td>
-                </tr>
-                 <tr>
-                    <td><strong>High Agreeableness</strong></td>
-                    <td>Tendency to be cooperative, kind, conflict-avoidant, and trusting; desire to see the good in others.[10, 11]</td>
-                    <td>Leverages victim's desire to maintain harmony and avoid confrontation to push boundaries subtly and maintain control without overt aggression. Victim is less likely to challenge manipulative behaviors.[11]</td>
-                </tr>
-                 <tr>
-                    <td><strong>High Conscientiousness</strong></td>
-                    <td>Characterized by responsibility, diligence, strong moral compass, and a desire to be fair and do what is right; prone to self-blame when accused of wrongdoing.[10, 11]</td>
-                    <td>Uses guilt-tripping and accusations of unfairness or inadequacy. Victim's conscientiousness leads them to internalize blame, doubt themselves, and try harder to meet the narcissist's (often unreasonable) expectations.[11]</td>
-                </tr>
-                <tr>
-                    <td><strong>Insecure Attachment Style</strong></td>
-                    <td>Often stemming from early relational trauma (e.g., narcissistic parenting), leading to anxiety in relationships, fear of abandonment, or a disorganized approach to intimacy.[17, 18]</td>
-                    <td>Initial love-bombing and feigned empathy create a false sense of security and deep connection, appealing to the victim's unmet attachment needs. This fosters a strong trauma bond, making it harder to disengage when devaluation begins.[7, 10, 17]</td>
-                </tr>
-                <tr>
-                    <td><strong>Codependency</strong></td>
-                    <td>Pattern of prioritizing others' needs above one's own, often deriving self-worth from being needed or caretaking; difficulty setting boundaries.[19, 20]</td>
-                    <td>The narcissist's constant need for attention, validation, and control is readily met by the codependent's need to be needed and tendency to over-give. The victim's lack of boundaries allows for progressive enmeshment.[19]</td>
-                </tr>
-                <tr>
-                    <td><strong>"Fixer" Archetype</strong></td>
-                    <td>Compulsive need to help, support, or "fix" others, often stemming from early life experiences where this behavior was a coping mechanism or source of validation.[22, 25]</td>
-                    <td>Presents as damaged, victimized, or needing rescue, triggering the fixer's desire to heal and repair. The fixer's efforts become a source of narcissistic supply, and they get caught in a cycle of trying to "save" the unchangeable narcissist.[2, 14, 22]</td>
-                </tr>
-                 <tr>
-                    <td><strong>Lack of Awareness</strong></td>
-                    <td>Unfamiliarity with the subtle tactics of covert narcissism (e.g., gaslighting, plausible deniability, feigned victimhood) and psychological abuse in general.[2, 3, 9, 26]</td>
-                    <td>Employs ambiguous and deniable abusive behaviors. The victim, unable to identify or name the manipulation, doubts their own perceptions and sanity, internalizes blame, and remains in the abusive dynamic for extended periods, often unaware of the true nature of the abuse.[9, 16, 26]</td>
-                </tr>
-            </tbody>
-        </table>
-        
-        <!-- ... The rest of the report text and tables would be inserted here following the same HTML structure ... -->
-
-        <h2>Conclusion: Towards a Holistic Model and Implications</h2>
-        <p>The trajectory of a victim enduring covert narcissistic abuse is a devastating journey of progressive psychological erosion. This multi-dimensional analysis reveals that the process is not one of random victimization but a complex, insidious ensnarement where the abuser’s subtle tactics systematically target and exploit the victim’s inherent strengths, personality traits, and learned relational patterns. These attributes, often positive in other contexts, are tragically transformed into sources of profound suffering, leading to complex trauma and a fractured sense of self. The "covert" nature of the abuse is the critical linchpin that enables it to persist, often unrecognized for extended periods, thereby inflicting deep and lasting damage to the victim's identity, relational capacity, physiological health, and overall well-being.[2, 3, 9]</p>
-    `;
-
-    document.getElementById('full-report-content').innerHTML = fullReportHTML;
 
     // --- CARD GENERATION ---
     function createCard(item) {
@@ -430,7 +359,6 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', () => {
             const card = button.parentElement;
             
-            // This logic allows closing other open cards in the same column
             if (!card.classList.contains('open')) {
                 const parentContainer = card.closest('.space-y-4');
                 parentContainer.querySelectorAll('.card.open').forEach(openCard => {
@@ -510,7 +438,11 @@ document.addEventListener('DOMContentLoaded', function() {
             r: {
                 angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
                 grid: { color: 'rgba(0, 0, 0, 0.1)' },
-                pointLabels: { font: { size: 12 } },
+                pointLabels: { font: { size: 12 }, color: '#3C3C3C' },
+                ticks: {
+                    backdropColor: 'rgba(253, 251, 246, 1)',
+                    color: '#6b7280'
+                },
                 suggestedMin: 0,
                 suggestedMax: 10
             }
@@ -518,19 +450,8 @@ document.addEventListener('DOMContentLoaded', function() {
         plugins: {
             legend: {
                 position: 'top',
-            },
-            tooltip: {
-                callbacks: {
-                    label: function(context) {
-                        let label = context.dataset.label || '';
-                        if (label) {
-                            label += ': ';
-                        }
-                        if (context.parsed.r !== null) {
-                            label += context.parsed.r;
-                        }
-                        return label;
-                    }
+                labels: {
+                    color: '#3C3C3C'
                 }
             }
         }
