@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Victim's Trajectory: Understanding Covert Narcissistic Abuse</title>
+    
+    <!-- Chosen Palette: Calm Neutrality -->
+    <!-- Application Structure Plan: The application is structured as an interactive journey rather than a linear report. It begins with a compassionate introduction. The core of the app is the "Victim's Trajectory," a three-part interactive section (The Target Profile, Abuser's Tactics, The Aftermath) using clickable cards for exploration. The most critical part is the "Synergy of Transformation," an interactive diagram visually linking pre-abuse traits to post-abuse symptoms, which is the central thesis of the source report. This is followed by a "Before & After" radar chart for a powerful visual comparison and an interactive diagram of physiological impacts. This structure was chosen because it breaks down dense information into manageable pieces and allows users to discover the crucial connections between concepts at their own pace, which is more effective for learning and retention than a long, scrolling document. -->
+    <!-- Visualization & Content Choices: 
+        - [The Target Profile & Abuser's Tactics]: Goal: Organize/Inform. Method: Interactive HTML cards. Interaction: Click to reveal details. Justification: Prevents overwhelming the user with text, encourages active exploration.
+        - [Synergy of Transformation]: Goal: Show Relationships. Method: Custom interactive diagram (HTML/CSS/JS). Interaction: Click a "Before" trait to see its "After" consequence and read the explanation. Justification: This is the most effective way to communicate the report's core "tragic synergy" concept, making the connection explicit and memorable.
+        - [Before & After Profile]: Goal: Compare. Method: Chart.js Radar Chart. Interaction: Buttons to toggle between "Before" and "After" profiles. Justification: Provides a stark, immediate visual representation of the psychological transformation.
+        - [Physiological Impact]: Goal: Inform/Organize. Method: Interactive HTML/CSS diagram. Interaction: Hover over body areas to see related symptoms. Justification: More engaging and less clinical than a simple list, connecting symptoms to the physical self.
+        - Library/Method: Vanilla JS for all logic, Chart.js for the radar chart, Tailwind CSS for styling. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF6;
+            color: #3C3C3C;
+        }
+        .active-nav {
+            color: #A97155;
+            font-weight: 600;
+        }
+        .trait-button, .symptom-button {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .trait-button.selected {
+            background-color: #6A8E8A;
+            color: white;
+            transform: scale(1.05);
+        }
+        .symptom-button.highlighted {
+            background-color: #A97155;
+            color: white;
+            border-color: #A97155;
+        }
+        .card .content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+            padding: 0 1.5rem;
+        }
+        .card.open .content {
+            max-height: 500px;
+            padding: 1rem 1.5rem 1.5rem;
+        }
+        .card.open .icon {
+            transform: rotate(45deg);
+        }
+        .body-part {
+            transition: background-color 0.3s ease;
+            position: absolute;
+            border-radius: 9999px;
+        }
+        .body-part:hover {
+            background-color: rgba(169, 113, 85, 0.5);
+        }
+        .symptom-tooltip {
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.3s linear;
+        }
+        .body-part:hover .symptom-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header & Navigation -->
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-[#A97155]">The Victim's Trajectory</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#introduction" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-[#A97155]">Introduction</a>
+                        <a href="#trajectory" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-[#A97155]">The Trajectory</a>
+                        <a href="#transformation" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-[#A97155]">Transformation</a>
+                        <a href="#impact" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-[#A97155]">Impact</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+        <!-- Introduction Section -->
+        <section id="introduction" class="text-center mb-24 scroll-mt-20">
+            <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-4">Understanding the Impact of Hidden Abuse</h2>
+            <p class="text-lg text-gray-700 max-w-3xl mx-auto">
+                Covert narcissistic abuse is a subtle, insidious form of psychological manipulation that often goes unrecognized for years. This interactive experience is designed to illuminate the victim's journey—not as a linear path, but as a complex interplay of vulnerabilities, abusive tactics, and profound after-effects. By exploring these connections, we can foster deeper understanding, awareness, and empathy for survivors.
+            </p>
+        </section>
+
+        <!-- The Trajectory Section -->
+        <section id="trajectory" class="mb-24 scroll-mt-20">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-4">The Victim's Trajectory</h2>
+                <p class="text-lg text-gray-700 max-w-3xl mx-auto">
+                    The journey through covert narcissistic abuse can be understood in three phases: the pre-existing traits that can become vulnerabilities, the abuser's manipulative tactics, and the resulting aftermath. Click on any card below to explore each concept in detail.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Part 1: The Target Profile -->
+                <div class="space-y-4">
+                    <h3 class="text-2xl font-semibold text-center text-[#6A8E8A]">1. The Target Profile</h3>
+                    <div id="vulnerability-cards" class="space-y-4"></div>
+                </div>
+                <!-- Part 2: Abuser's Tactics -->
+                <div class="space-y-4">
+                    <h3 class="text-2xl font-semibold text-center text-gray-700">2. The Abuser's Tactics</h3>
+                    <div id="tactic-cards" class="space-y-4"></div>
+                </div>
+                <!-- Part 3: The Aftermath -->
+                <div class="space-y-4">
+                    <h3 class="text-2xl font-semibold text-center text-[#A97155]">3. The Aftermath</h3>
+                    <div id="symptom-cards" class="space-y-4"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Transformation Section -->
+        <section id="transformation" class="mb-24 scroll-mt-20">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-4">The Synergy of Transformation</h2>
+                <p class="text-lg text-gray-700 max-w-3xl mx-auto">
+                    The most profound damage occurs in the interaction between a victim's inherent traits and the abuse. Strengths are twisted into sources of suffering. Click on a "Before" trait to see how it is tragically transformed into an "After" symptom.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-6 items-start">
+                <div class="space-y-3">
+                    <h4 class="text-xl font-semibold text-center text-[#6A8E8A]">Before: Inherent Traits</h4>
+                    <div id="trait-buttons-container" class="flex flex-col space-y-2"></div>
+                </div>
+                <div id="synergy-explanation" class="bg-white p-6 rounded-lg shadow-lg min-h-[200px] lg:mt-9 flex items-center justify-center text-center">
+                    <p class="text-gray-500">Select a trait from the left to see the connection.</p>
+                </div>
+                <div class="space-y-3">
+                    <h4 class="text-xl font-semibold text-center text-[#A97155]">After: Post-Abuse Symptoms</h4>
+                    <div id="symptom-buttons-container" class="flex flex-col space-y-2"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Impact Section -->
+        <section id="impact" class="scroll-mt-20">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-4">Visualizing the Impact</h2>
+                <p class="text-lg text-gray-700 max-w-3xl mx-auto">
+                    The abuse profoundly alters a person's psychological profile and impacts their physical health. These visualizations provide a snapshot of the changes.
+                </p>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <!-- Before/After Radar Chart -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-xl font-semibold text-center mb-4">Psychological Profile: Before vs. After</h3>
+                     <div class="chart-container">
+                        <canvas id="profileChart"></canvas>
+                    </div>
+                    <div class="flex justify-center space-x-4 mt-4">
+                        <button id="show-before-btn" class="px-4 py-2 bg-[#6A8E8A] text-white rounded-md hover:bg-opacity-80 transition">Show 'Before' Profile</button>
+                        <button id="show-after-btn" class="px-4 py-2 bg-[#A97155] text-white rounded-md hover:bg-opacity-80 transition">Show 'After' Profile</button>
+                    </div>
+                </div>
+
+                <!-- Physiological Impact -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-xl font-semibold text-center mb-4">Physiological Manifestations</h3>
+                    <p class="text-center text-gray-600 mb-6">The body keeps the score. Chronic stress from abuse often manifests physically. Hover over the areas below.</p>
+                    <div class="relative w-[150px] h-[350px] mx-auto">
+                        <!-- Head -->
+                        <div class="body-part top-0 left-[37.5%] w-[25%] h-[15%]" data-symptom="Headaches & Migraines, Brain Fog, Cognitive Issues">
+                             <div class="symptom-tooltip absolute -top-16 -left-12 w-40 bg-gray-800 text-white text-xs rounded py-1 px-2 text-center">Headaches & Migraines, Cognitive Issues</div>
+                        </div>
+                        <!-- Chest/Heart -->
+                        <div class="body-part top-[20%] left-[25%] w-[50%] h-[20%]" data-symptom="Cardiovascular Issues, Weakened Immune Response, Autoimmune Disorders">
+                             <div class="symptom-tooltip absolute top-1/4 -right-44 w-40 bg-gray-800 text-white text-xs rounded py-1 px-2 text-center">Immune & Autoimmune Issues</div>
+                        </div>
+                        <!-- Stomach -->
+                        <div class="body-part top-[45%] left-[30%] w-[40%] h-[15%]" data-symptom="Gastrointestinal Issues (IBS, Acid Reflux)">
+                             <div class="symptom-tooltip absolute top-1/2 -left-44 w-40 bg-gray-800 text-white text-xs rounded py-1 px-2 text-center">Gastrointestinal Issues (IBS)</div>
+                        </div>
+                         <!-- Body -->
+                        <div class="body-part top-[15%] left-[10%] w-[80%] h-[85%] !rounded-2xl" data-symptom="Chronic Fatigue, Fibromyalgia, Muscle Tension, Sleep Disturbances">
+                             <div class="symptom-tooltip absolute -bottom-12 left-0 w-40 bg-gray-800 text-white text-xs rounded py-1 px-2 text-center">Chronic Fatigue, Fibromyalgia, Muscle Tension</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="bg-gray-100 mt-24">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500">
+            <p>This information is for educational purposes only and is not a substitute for professional medical or psychological advice. If you believe you are in an abusive situation, please seek help from qualified professionals.</p>
+        </div>
+    </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // --- DATA ---
+    const appData = {
+        vulnerabilities: [
+            { id: 'empathy', title: 'High Empathy', content: "Innate ability to understand and share the feelings of others. The covert narcissist exploits this by presenting as vulnerable or misunderstood, drawing in the victim's care as a source of narcissistic supply." },
+            { id: 'agreeableness', title: 'High Agreeableness', content: "A tendency to be cooperative, kind, and conflict-avoidant. This is leveraged to push boundaries subtly, as the victim is less likely to challenge manipulative behaviors to maintain harmony." },
+            { id: 'conscientiousness', title: 'High Conscientiousness', content: "A strong sense of responsibility and fairness. The narcissist uses guilt-tripping and accusations, which the victim internalizes, causing them to doubt themselves and try harder to meet unreasonable expectations." },
+            { id: 'insecure_attachment', title: 'Insecure Attachment', content: "Often stemming from early relational trauma, this creates a 'blueprint' for abuse. Initial love-bombing creates a false sense of security that appeals to unmet attachment needs, fostering a strong trauma bond." },
+            { id: 'fixer_archetype', title: 'The "Fixer" Archetype', content: "A compulsive need to help or rescue others. The narcissist presents as damaged or victimized, triggering the fixer's desire to heal them, which becomes an endless, draining cycle of providing supply." },
+            { id: 'unawareness', title: 'Lack of Awareness', content: "Unfamiliarity with the subtle tactics of covert abuse like gaslighting and plausible deniability. The victim, unable to name the manipulation, doubts their own sanity and remains in the abusive dynamic for longer." },
+        ],
+        tactics: [
+            { title: 'Gaslighting', content: "Manipulating someone into questioning their own sanity and perception of reality. The covert narcissist will deny events, distort facts, or call the victim 'too sensitive' to maintain control." },
+            { title: 'Plausible Deniability', content: "Operating in ambiguous 'grey areas' so that hurtful actions can always be reframed as misunderstandings or good intentions. This leaves the victim confused and unable to prove the abuse." },
+            { title: 'Feigned Victimhood', content: "Presenting themselves as the one who is misunderstood, hurt, or wronged. This elicits sympathy, deflects accountability, and can make the victim feel guilty for being upset." },
+            { title: 'Quiet Devaluing', content: "Subtle put-downs, backhanded compliments, or dismissive gestures that slowly erode the victim's self-worth over time, often in a way that is hard to call out directly." },
+            { title: 'Emotional Withholding', content: "Punishing the victim by withdrawing affection, communication (silent treatment), or support, making the victim feel anxious and desperate to regain the narcissist's approval." },
+            { title: 'Intermittent Reinforcement', content: "Cycles of positive attention (love bombing) and negative treatment (devaluation). This creates a powerful, addictive bond similar to a gambling addiction, as the victim clings to hope for the 'good times'." },
+        ],
+        symptoms: [
+            { id: 'cptsd', title: 'Complex PTSD (C-PTSD)', content: "A result of prolonged relational trauma. Symptoms include emotional flashbacks, a toxic inner critic, emotional dysregulation, and a persistent feeling of being unsafe." },
+            { id: 'cognitive_dissonance', title: 'Cognitive Dissonance', content: "The mental stress of holding conflicting beliefs: 'this person loves me' vs. 'this person is harming me.' This leads to confusion, rationalizing the abuse, and self-blame." },
+            { id: 'narcissistic_fleas', title: '"Narcissistic Fleas"', content: "When the victim adopts the abuser's behaviors (e.g., reactive abuse, withdrawal) as a survival mechanism. This causes intense guilt and can be used by the abuser to shift blame." },
+            { id: 'identity_loss', title: 'Identity Loss / Erasure', content: "After years of suppressing their own needs and opinions to please the abuser, victims may no longer know who they are, what they like, or what they believe." },
+            { id: 'social_isolation', title: 'Social Isolation & Distrust', content: "Profound difficulty trusting others and oneself. This can be engineered by the abuser or self-imposed due to fear, shame, and hypervigilance." },
+            { id: 'physiological', title: 'Physiological Manifestations', content: "Chronic stress manifests physically as fatigue, sleep disturbances, GI issues, autoimmune problems, fibromyalgia, and chronic pain. The body keeps the score." },
+        ],
+        synergy: [
+            { from: 'empathy', to: 'hypervigilance', text: 'A high capacity for empathy, once used for connection, is corrupted into painful hypervigilance. The victim learns to use their sensitivity not to connect, but to constantly scan others for subtle signs of insincerity, manipulation, or threat, making genuine connection feel unsafe.' },
+            { from: 'self_blame', to: 'toxic_shame', text: 'A tendency for self-blame is magnified by the narcissist’s projections into toxic shame. This is not just guilt; it is a deep, pervasive belief of being fundamentally flawed, worthless, and deserving of the abuse, internalizing the abuser’s contempt.' },
+            { from: 'people_pleasing', to: 'identity_loss', text: 'A history of people-pleasing is exploited to the point of complete identity loss. By constantly suppressing their own needs and opinions to manage the abuser, the victim becomes profoundly disconnected from their authentic self, no longer knowing who they are.' },
+            { from: 'trusting_nature', to: 'pervasive_distrust', text: 'An open, trusting nature is systematically shattered by intimate betrayal. This leads to pervasive distrust, not only in others but, crucially, in one’s own judgment. The world no longer feels safe, and kindness from others is met with suspicion.' }
+        ],
+        synergySymptoms: [
+            { id: 'hypervigilance', title: 'Painful Hypervigilance' },
+            { id: 'toxic_shame', title: 'Toxic Shame' },
+            { id: 'identity_loss', title: 'Identity Loss' },
+            { id: 'pervasive_distrust', title: 'Pervasive Distrust' },
+        ],
+         synergyTraits: [
+            { id: 'empathy', title: 'High Empathy' },
+            { id: 'self_blame', title: 'Tendency for Self-Blame' },
+            { id: 'people_pleasing', title: 'People-Pleasing' },
+            { id: 'trusting_nature', title: 'Trusting Nature' },
+        ]
+    };
+
+    // --- CARD GENERATION ---
+    function createCard(item) {
+        return `
+            <div class="card bg-white rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-xl">
+                <button class="w-full text-left p-4 flex justify-between items-center focus:outline-none">
+                    <span class="font-semibold">${item.title}</span>
+                    <span class="icon text-xl text-[#A97155] transform transition-transform duration-300">+</span>
+                </button>
+                <div class="content text-gray-700">
+                    <p>${item.content}</p>
+                </div>
+            </div>
+        `;
+    }
+
+    const vulnerabilityContainer = document.getElementById('vulnerability-cards');
+    const tacticContainer = document.getElementById('tactic-cards');
+    const symptomContainer = document.getElementById('symptom-cards');
+    
+    appData.vulnerabilities.forEach(item => vulnerabilityContainer.innerHTML += createCard(item));
+    appData.tactics.forEach(item => tacticContainer.innerHTML += createCard(item));
+    appData.symptoms.forEach(item => symptomContainer.innerHTML += createCard(item));
+
+    document.querySelectorAll('.card button').forEach(button => {
+        button.addEventListener('click', () => {
+            button.parentElement.classList.toggle('open');
+        });
+    });
+
+    // --- SYNERGY/TRANSFORMATION LOGIC ---
+    const traitButtonsContainer = document.getElementById('trait-buttons-container');
+    const symptomButtonsContainer = document.getElementById('symptom-buttons-container');
+    const synergyExplanation = document.getElementById('synergy-explanation');
+
+    appData.synergyTraits.forEach(trait => {
+        traitButtonsContainer.innerHTML += `<button class="trait-button text-left p-3 bg-white border border-gray-300 rounded-md hover:bg-gray-100" data-trait-id="${trait.id}">${trait.title}</button>`;
+    });
+
+    appData.synergySymptoms.forEach(symptom => {
+        symptomButtonsContainer.innerHTML += `<div class="symptom-button text-left p-3 bg-white border border-gray-300 rounded-md" data-symptom-id="${symptom.id}">${symptom.title}</div>`;
+    });
+
+    traitButtonsContainer.addEventListener('click', e => {
+        if (e.target.matches('.trait-button')) {
+            const selectedTraitId = e.target.dataset.traitId;
+
+            document.querySelectorAll('.trait-button').forEach(btn => btn.classList.remove('selected'));
+            e.target.classList.add('selected');
+
+            const synergyData = appData.synergy.find(s => s.from === selectedTraitId);
+            
+            document.querySelectorAll('.symptom-button').forEach(btn => {
+                if(btn.dataset.symptomId === synergyData.to) {
+                    btn.classList.add('highlighted');
+                } else {
+                    btn.classList.remove('highlighted');
+                }
+            });
+
+            synergyExplanation.innerHTML = `<p class="text-gray-800">${synergyData.text}</p>`;
+        }
+    });
+    
+    // --- CHART.JS LOGIC ---
+    const ctx = document.getElementById('profileChart').getContext('2d');
+    let profileChart;
+
+    const beforeData = {
+        labels: ['Empathy', 'Agreeableness', 'Conscientiousness', 'Trust', 'Self-Esteem', 'Boundaries'],
+        datasets: [{
+            label: 'Before Profile',
+            data: [9, 8, 8, 9, 7, 4],
+            backgroundColor: 'rgba(106, 142, 138, 0.2)',
+            borderColor: 'rgba(106, 142, 138, 1)',
+            borderWidth: 2,
+            pointBackgroundColor: 'rgba(106, 142, 138, 1)',
+        }]
+    };
+
+    const afterData = {
+        labels: ['Empathy', 'Agreeableness', 'Conscientiousness', 'Trust', 'Self-Esteem', 'Boundaries'],
+        datasets: [{
+            label: 'After Profile',
+            data: [5, 4, 5, 2, 3, 8], // Trust/Esteem decrease, boundaries (hypervigilance) increase
+            backgroundColor: 'rgba(169, 113, 85, 0.2)',
+            borderColor: 'rgba(169, 113, 85, 1)',
+            borderWidth: 2,
+            pointBackgroundColor: 'rgba(169, 113, 85, 1)',
+        }]
+    };
+    
+    const chartOptions = {
+        maintainAspectRatio: false,
+        responsive: true,
+        scales: {
+            r: {
+                angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                pointLabels: { font: { size: 12 } },
+                suggestedMin: 0,
+                suggestedMax: 10
+            }
+        },
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        let label = context.dataset.label || '';
+                        if (label) {
+                            label += ': ';
+                        }
+                        if (context.parsed.r !== null) {
+                            label += context.parsed.r;
+                        }
+                        return label;
+                    }
+                }
+            }
+        }
+    };
+
+    function createOrUpdateChart(data) {
+        if (profileChart) {
+            profileChart.destroy();
+        }
+        profileChart = new Chart(ctx, {
+            type: 'radar',
+            data: data,
+            options: chartOptions,
+        });
+    }
+
+    document.getElementById('show-before-btn').addEventListener('click', () => createOrUpdateChart(beforeData));
+    document.getElementById('show-after-btn').addEventListener('click', () => createOrUpdateChart(afterData));
+    
+    // Initial chart load
+    createOrUpdateChart(beforeData);
+
+    // --- SCROLLSPY NAVIGATION HIGHLIGHTING ---
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('section');
+
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (pageYOffset >= sectionTop - 80) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.classList.remove('active-nav');
+            if (link.getAttribute('href').includes(current)) {
+                link.classList.add('active-nav');
+            }
+        });
+    });
+
+});
+</script>
+
+</body>
+</html>
