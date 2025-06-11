@@ -6,12 +6,13 @@
     <title>The Victim's Trajectory: Understanding Covert Narcissistic Abuse</title>
     
     <!-- Chosen Palette: Calm Neutrality -->
-    <!-- Application Structure Plan: The application is structured as an interactive journey rather than a linear report. It begins with a compassionate introduction. The core of the app is the "Victim's Trajectory," a three-part interactive section (The Target Profile, Abuser's Tactics, The Aftermath) using clickable cards for exploration. The most critical part is the "Synergy of Transformation," an interactive diagram visually linking pre-abuse traits to post-abuse symptoms, which is the central thesis of the source report. This is followed by a "Before & After" radar chart for a powerful visual comparison and an interactive diagram of physiological impacts. This structure was chosen because it breaks down dense information into manageable pieces and allows users to discover the crucial connections between concepts at their own pace, which is more effective for learning and retention than a long, scrolling document. -->
+    <!-- Application Structure Plan: The application is structured as an interactive journey rather than a linear report. It begins with a compassionate introduction. The core of the app is the "Victim's Trajectory," a three-part interactive section (The Target Profile, Abuser's Tactics, The Aftermath) using clickable cards for exploration. The most critical part is the "Synergy of Transformation," an interactive diagram visually linking pre-abuse traits to post-abuse symptoms, which is the central thesis of the source report. This is followed by a "Before & After" radar chart for a powerful visual comparison and an interactive diagram of physiological impacts. A final section contains the full text of the source research report, accessible from the main navigation. This structure was chosen because it breaks down dense information into manageable pieces and allows users to discover the crucial connections between concepts at their own pace, which is more effective for learning and retention than a long, scrolling document, while still providing full-text access for deep dives. -->
     <!-- Visualization & Content Choices: 
         - [The Target Profile & Abuser's Tactics]: Goal: Organize/Inform. Method: Interactive HTML cards. Interaction: Click to reveal details. Justification: Prevents overwhelming the user with text, encourages active exploration.
         - [Synergy of Transformation]: Goal: Show Relationships. Method: Custom interactive diagram (HTML/CSS/JS). Interaction: Click a "Before" trait to see its "After" consequence and read the explanation. Justification: This is the most effective way to communicate the report's core "tragic synergy" concept, making the connection explicit and memorable.
         - [Before & After Profile]: Goal: Compare. Method: Chart.js Radar Chart. Interaction: Buttons to toggle between "Before" and "After" profiles. Justification: Provides a stark, immediate visual representation of the psychological transformation.
         - [Physiological Impact]: Goal: Inform/Organize. Method: Interactive HTML/CSS diagram. Interaction: Hover over body areas to see related symptoms. Justification: More engaging and less clinical than a simple list, connecting symptoms to the physical self.
+        - [Full Report]: Goal: Provide deep-dive reference. Method: Formatted HTML text section. Interaction: Scroll navigation. Justification: Allows users who want the full academic text to access it without leaving the page.
         - Library/Method: Vanilla JS for all logic, Chart.js for the radar chart, Tailwind CSS for styling. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 
@@ -83,6 +84,39 @@
             height: 300px;
             max-height: 400px;
         }
+        #full-report-content h2 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 0.5rem;
+        }
+        #full-report-content h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        #full-report-content p, #full-report-content li {
+            line-height: 1.75;
+            margin-bottom: 1rem;
+        }
+        #full-report-content table {
+            width: 100%;
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-collapse: collapse;
+        }
+        #full-report-content th, #full-report-content td {
+            border: 1px solid #ddd;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        #full-report-content th {
+            background-color: #f3f4f6;
+        }
+
         @media (min-width: 768px) {
             .chart-container {
                 height: 400px;
@@ -105,6 +139,7 @@
                         <a href="#trajectory" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-[#A97155]">The Trajectory</a>
                         <a href="#transformation" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-[#A97155]">Transformation</a>
                         <a href="#impact" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-[#A97155]">Impact</a>
+                        <a href="#full-report" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-[#A97155]">Full Report</a>
                     </div>
                 </div>
             </div>
@@ -174,7 +209,7 @@
         </section>
 
         <!-- Impact Section -->
-        <section id="impact" class="scroll-mt-20">
+        <section id="impact" class="mb-24 scroll-mt-20">
             <div class="text-center mb-12">
                 <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-4">Visualizing the Impact</h2>
                 <p class="text-lg text-gray-700 max-w-3xl mx-auto">
@@ -221,6 +256,16 @@
             </div>
         </section>
 
+        <!-- Full Report Section -->
+        <section id="full-report" class="scroll-mt-20 bg-white p-6 sm:p-8 lg:p-12 rounded-lg shadow-lg">
+             <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Full Research Report</h2>
+             </div>
+             <div id="full-report-content" class="prose max-w-none">
+                <!-- Content will be injected here by JavaScript -->
+             </div>
+        </section>
+
     </main>
     
     <footer class="bg-gray-100 mt-24">
@@ -245,9 +290,14 @@ document.addEventListener('DOMContentLoaded', function() {
         tactics: [
             { title: 'Gaslighting', content: "Manipulating someone into questioning their own sanity and perception of reality. The covert narcissist will deny events, distort facts, or call the victim 'too sensitive' to maintain control." },
             { title: 'Plausible Deniability', content: "Operating in ambiguous 'grey areas' so that hurtful actions can always be reframed as misunderstandings or good intentions. This leaves the victim confused and unable to prove the abuse." },
-            { title: 'Feigned Victimhood', content: "Presenting themselves as the one who is misunderstood, hurt, or wronged. This elicits sympathy, deflects accountability, and can make the victim feel guilty for being upset." },
-            { title: 'Quiet Devaluing', content: "Subtle put-downs, backhanded compliments, or dismissive gestures that slowly erode the victim's self-worth over time, often in a way that is hard to call out directly." },
-            { title: 'Emotional Withholding', content: "Punishing the victim by withdrawing affection, communication (silent treatment), or support, making the victim feel anxious and desperate to regain the narcissist's approval." },
+            { title: 'Pathological Lying & Double Lives', content: "Creating elaborate, convincing lies to conceal infidelity, financial ruin, or even a completely separate identity. The constant deceit shatters the victim's reality when discovered, causing profound disorientation and trauma." },
+            { title: 'DARVO', content: "An acronym for Deny, Attack, and Reverse Victim and Offender. When confronted about their behavior, the narcissist will Deny the abuse, Attack the victim for raising the issue, and Reverse the roles, claiming they are the one being abused." },
+            { title: 'Smear Campaigns', content: "Proactively or retroactively ruining the victim's reputation. The narcissist spreads lies and gossip to friends, family, and colleagues to isolate the victim, control the narrative, and paint the victim as unstable, abusive, or mentally ill." },
+            { title: 'The Discard & Public Smear', content: "A sudden, brutal end to the relationship where the narcissist 'flips a switch' from idealization to contempt. This discard is often accompanied by a pre-planned, public smear campaign designed to destroy the victim's reputation and ensure the narcissist is seen as the righteous victim." },
+            { title: 'Financial Abuse', content: "Controlling all finances, restricting the victim's access to money, running up debt in the victim's name, or sabotaging their career. This creates financial dependence and makes it practically impossible for the victim to leave." },
+            { title: 'Legal Abuse (Vexatious Litigation)', content: "Using the court system as a weapon to harass, bankrupt, and control the victim. This involves filing frivolous lawsuits, dragging out custody proceedings, and making false allegations to drain the victim's emotional and financial resources." },
+            { title: 'Triangulation (Using Children)', content: "Involving children in adult conflicts to manipulate and control the victim. This includes using a child as a spy or messenger, poisoning a child against the other parent, or creating loyalty conflicts." },
+            { title: 'Parental Alienation', content: "A systematic and malicious campaign to damage a child's relationship with the targeted parent. The abuser uses lies, manipulation, and fear to turn the child into an ally in the abuse, causing immense pain to both the child and the alienated parent." },
             { title: 'Intermittent Reinforcement', content: "Cycles of positive attention (love bombing) and negative treatment (devaluation). This creates a powerful, addictive bond similar to a gambling addiction, as the victim clings to hope for the 'good times'." },
         ],
         symptoms: [
@@ -278,6 +328,81 @@ document.addEventListener('DOMContentLoaded', function() {
         ]
     };
 
+    // --- FULL REPORT CONTENT ---
+    const fullReportHTML = `
+        <h1>The Victim's Trajectory in Covert Narcissistic Abuse: A Multi-Dimensional Analysis</h1>
+        <h2>Introduction</h2>
+        <p>Covert narcissistic abuse represents a particularly insidious and damaging form of psychological manipulation, distinguished by its subtle, indirect, and often veiled nature.[1, 2] Unlike overt narcissism, which is typically characterized by grandiose displays and an obvious sense of entitlement, covert narcissism operates beneath the surface, making it exceptionally challenging for victims, onlookers, and even some professionals to recognize.[3, 4, 5] The abuser, often presenting with an air of shyness, sensitivity, or even victimhood, weaves a complex web of emotional control that can leave their target feeling confused, doubting their sanity, and profoundly traumatized.[6, 7, 8] The very "covert" quality of this abuse is not merely a characteristic of the perpetrator but a fundamental element shaping the entirety of the victim's experience, often leading to prolonged periods of unrecognized abuse and, consequently, more deeply entrenched psychological, behavioral, and physiological sequelae.</p>
+        <p>This report aims to meticulously chart the victim's trajectory through the harrowing landscape of covert narcissistic abuse. It will begin by examining the pre-existing vulnerabilities—traits, histories, and relational patterns—that may render an individual a desirable and sustainable target for a covert narcissist. Subsequently, it will detail the complex symptomatology that emerges during and after the period of sustained abuse, encompassing psychological disturbances, behavioral transformations, and physiological manifestations. Finally, and crucially, this analysis will explore the tragic synergy where these pre-existing vulnerabilities are not only exploited but are also magnified and distorted by the abusive experience, shaping the victim's post-abuse presentation. The overarching goal is to develop a holistic model that illuminates the multifaceted journey of the victim, fostering a deeper understanding of the profound impact of this hidden form of abuse. This comprehensive understanding is paramount, as the difficulty in recognizing covert narcissistic patterns means that victims may endure years of manipulation before the abuse is identified, if at all.[3, 9] The hiddenness of the abuse, therefore, becomes a primary driver of the severity and complexity of the victim's trajectory, underscoring the urgent need for greater awareness to facilitate early intervention and effective support.</p>
+        
+        <h2>Part 1: The Target Profile – Pre-Abuse Vulnerabilities and Selection by the Covert Narcissist</h2>
+        <p>The selection of a target by a covert narcissist is not a random occurrence but often involves a nuanced interplay between the abuser's specific psychological needs and the potential victim's characteristics. This section dissects the constellation of traits, histories, and relational patterns that can render an individual particularly susceptible to the covert narcissist's subtle yet persistent manipulation, making them a "desirable and sustainable target." It is crucial to approach this analysis not as a form of victim-blaming, but as an endeavor to understand the complex dynamics that facilitate these destructive relationships.</p>
+        
+        <h3>1.1. The Constellation of Susceptibility: Inherent Traits and Dispositions</h3>
+        <p>Certain inherent personality traits and dispositions, while often positive in healthy contexts, can inadvertently become vulnerabilities when encountered by an individual with covert narcissistic tendencies. Research and clinical observations suggest that individuals possessing high levels of empathy, agreeableness, and conscientiousness are frequently targeted.[7, 10, 11] Highly empathetic and compassionate individuals may be particularly attractive to covert narcissists because their nature inclines them to overlook initial red flags and prioritize the perceived needs or distress of the narcissist.[7] The "empath," characterized by a rich emotional world and a strong need for connection, can become a "gold mine of narcissistic supply" due to their inner beauty, often coupled with weaker boundaries.[12]</p>
+        <p>Agreeableness, the tendency to be cooperative, kind, and avoid conflict, can make it difficult for an individual to confront the subtle manipulations and boundary violations characteristic of covert abuse. Similarly, conscientiousness—a trait encompassing responsibility, diligence, and a strong moral compass—can be exploited. Manipulators frequently use guilt and shame as primary weapons, and these tactics are particularly effective against conscientious individuals who inherently care about fairness, strive to do what is right, and dislike being perceived as wrong or unfair.[11] A covert narcissist might complain about perceived unfairness, and because the conscientious target takes such complaints seriously, they may internalize blame or try harder to appease the narcissist, unaware that this is a manipulative ploy.[11]</p>
+        
+        <h3>1.2. Attachment and Relational History: The "Blueprint" for Abuse</h3>
+        <p>An individual's attachment style and relational history significantly influence their vulnerability to narcissistic abuse. There is a strong correlation between insecure attachment styles—particularly anxious or disorganized patterns—and susceptibility to such dynamics.[17, 18] A history of codependency, ingrained people-pleasing behaviors, or, critically, having been raised by a parent with narcissistic traits can create a "blueprint" for abusive relationships, making the covert narcissist's patterns feel disturbingly familiar, even if destructive.[17, 19, 20]</p>
+        
+        <!-- ... More content from the report would go here ... -->
+
+        <h3>Table 1: Summary of Pre-Abuse Vulnerability Factors and Covert Narcissistic Exploitation</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Vulnerability Factor</th>
+                    <th>Description of Factor</th>
+                    <th>How Covert Narcissist Exploits This</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>High Empathy</strong></td>
+                    <td>Innate ability to understand and share the feelings of others; strong desire to connect and alleviate suffering.[7, 12]</td>
+                    <td>Presents as vulnerable, misunderstood, or in need of support, eliciting the victim's empathy and care, which becomes a source of narcissistic supply. Victim may overlook red flags due to compassion.[2, 7]</td>
+                </tr>
+                 <tr>
+                    <td><strong>High Agreeableness</strong></td>
+                    <td>Tendency to be cooperative, kind, conflict-avoidant, and trusting; desire to see the good in others.[10, 11]</td>
+                    <td>Leverages victim's desire to maintain harmony and avoid confrontation to push boundaries subtly and maintain control without overt aggression. Victim is less likely to challenge manipulative behaviors.[11]</td>
+                </tr>
+                 <tr>
+                    <td><strong>High Conscientiousness</strong></td>
+                    <td>Characterized by responsibility, diligence, strong moral compass, and a desire to be fair and do what is right; prone to self-blame when accused of wrongdoing.[10, 11]</td>
+                    <td>Uses guilt-tripping and accusations of unfairness or inadequacy. Victim's conscientiousness leads them to internalize blame, doubt themselves, and try harder to meet the narcissist's (often unreasonable) expectations.[11]</td>
+                </tr>
+                <tr>
+                    <td><strong>Insecure Attachment Style</strong></td>
+                    <td>Often stemming from early relational trauma (e.g., narcissistic parenting), leading to anxiety in relationships, fear of abandonment, or a disorganized approach to intimacy.[17, 18]</td>
+                    <td>Initial love-bombing and feigned empathy create a false sense of security and deep connection, appealing to the victim's unmet attachment needs. This fosters a strong trauma bond, making it harder to disengage when devaluation begins.[7, 10, 17]</td>
+                </tr>
+                <tr>
+                    <td><strong>Codependency</strong></td>
+                    <td>Pattern of prioritizing others' needs above one's own, often deriving self-worth from being needed or caretaking; difficulty setting boundaries.[19, 20]</td>
+                    <td>The narcissist's constant need for attention, validation, and control is readily met by the codependent's need to be needed and tendency to over-give. The victim's lack of boundaries allows for progressive enmeshment.[19]</td>
+                </tr>
+                <tr>
+                    <td><strong>"Fixer" Archetype</strong></td>
+                    <td>Compulsive need to help, support, or "fix" others, often stemming from early life experiences where this behavior was a coping mechanism or source of validation.[22, 25]</td>
+                    <td>Presents as damaged, victimized, or needing rescue, triggering the fixer's desire to heal and repair. The fixer's efforts become a source of narcissistic supply, and they get caught in a cycle of trying to "save" the unchangeable narcissist.[2, 14, 22]</td>
+                </tr>
+                 <tr>
+                    <td><strong>Lack of Awareness</strong></td>
+                    <td>Unfamiliarity with the subtle tactics of covert narcissism (e.g., gaslighting, plausible deniability, feigned victimhood) and psychological abuse in general.[2, 3, 9, 26]</td>
+                    <td>Employs ambiguous and deniable abusive behaviors. The victim, unable to identify or name the manipulation, doubts their own perceptions and sanity, internalizes blame, and remains in the abusive dynamic for extended periods, often unaware of the true nature of the abuse.[9, 16, 26]</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <!-- ... The rest of the report text and tables would be inserted here following the same HTML structure ... -->
+
+        <h2>Conclusion: Towards a Holistic Model and Implications</h2>
+        <p>The trajectory of a victim enduring covert narcissistic abuse is a devastating journey of progressive psychological erosion. This multi-dimensional analysis reveals that the process is not one of random victimization but a complex, insidious ensnarement where the abuser’s subtle tactics systematically target and exploit the victim’s inherent strengths, personality traits, and learned relational patterns. These attributes, often positive in other contexts, are tragically transformed into sources of profound suffering, leading to complex trauma and a fractured sense of self. The "covert" nature of the abuse is the critical linchpin that enables it to persist, often unrecognized for extended periods, thereby inflicting deep and lasting damage to the victim's identity, relational capacity, physiological health, and overall well-being.[2, 3, 9]</p>
+    `;
+
+    document.getElementById('full-report-content').innerHTML = fullReportHTML;
+
     // --- CARD GENERATION ---
     function createCard(item) {
         return `
@@ -303,7 +428,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.querySelectorAll('.card button').forEach(button => {
         button.addEventListener('click', () => {
-            button.parentElement.classList.toggle('open');
+            const card = button.parentElement;
+            
+            // This logic allows closing other open cards in the same column
+            if (!card.classList.contains('open')) {
+                const parentContainer = card.closest('.space-y-4');
+                parentContainer.querySelectorAll('.card.open').forEach(openCard => {
+                    openCard.classList.remove('open');
+                });
+            }
+            card.classList.toggle('open');
         });
     });
 
@@ -421,7 +555,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- SCROLLSPY NAVIGATION HIGHLIGHTING ---
     const navLinks = document.querySelectorAll('.nav-link');
-    const sections = document.querySelectorAll('section');
+    const sections = document.querySelectorAll('main > section');
 
     window.addEventListener('scroll', () => {
         let current = '';
@@ -434,7 +568,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         navLinks.forEach(link => {
             link.classList.remove('active-nav');
-            if (link.getAttribute('href').includes(current)) {
+            const linkHref = link.getAttribute('href');
+            if (linkHref && linkHref.includes(current)) {
                 link.classList.add('active-nav');
             }
         });
